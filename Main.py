@@ -34,16 +34,22 @@ def lock_file(item, Fernet_object): #concatenate lines into one first
     submit = []
     final_line = ''
 
-    with open(item, 'r+b') as lock_file:
+    with open(item, 'r+') as lock_file:
         raw_text = lock_file.readlines()
         lock_file.seek(0)
         lock_file.truncate(0)
         for line in raw_text:
-            final_line+=str(line)  
-        lock_file.write(Fernet_object.encrypt(final_line.encode()))
-        lock_file.close()
+            if len(line) > 2:
+                lock_file.write(str(Fernet_object.encrypt(line.encode())))
+                lock_file.write('\n')
+                #lock_file.close()
+            
+            #final_line+=str(line)
+            #lock_file.close()
+        
+        
        
-    return results
+    return "Done"
 
 def prep_text_file(block):
     wildcard = '\\'
@@ -67,12 +73,19 @@ def unlock_file(item, Fernet_object):
     array_prs = [[], []]
     submit = []
     results = []
+    final_line = ''
     with open(item,'r+b') as lock_file:
-        enc_text = lock_file.read()
+        enc_text = lock_file.readlines()
         print(len(enc_text))
-        #lock_file.seek(0)
-        #lock_file.truncate(0)
-        decrypt_text = Fernet_object.decrypt(enc_text)
+        lock_file.seek(0)
+        lock_file.truncate(0)
+        for line in enc_text:
+            if len(line) > 2:
+                final_line+=str(Fernet_object.decrypt(line))
+
+              
+
+        lock_file.write(final_line)
         #print(len(decrypt_text))
         print(decrypt_text)
         print(array_prs)
