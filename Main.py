@@ -2,11 +2,8 @@ import cryptography
 import base64
 import os
 from cryptography.fernet import Fernet
+import ast
 
-
-#Geohot vectors and tiny grad cherry comptuer
-
-# !!!!! do all this with the click of a button !!!!!!!!!
 
 # !!!!! PUT THIS IN THE FILE YOU WANT TO SECRIFY, MAKES LIFE EASIER !!!!!
 
@@ -51,46 +48,26 @@ def lock_file(item, Fernet_object): #concatenate lines into one first
        
     return "Done"
 
-def prep_text_file(block):
-    wildcard = '\\'
-    array_pairs = [[], []]
-    start_ind = 0
-    array_ind = 0
-    #need to get indices of all escapes, then add escapes
-    while block.find(wildcard, start_ind) != -1:
-        array_pairs[0].append(block.find(wildcard, start_ind))
-        start_ind = array_pairs[0][array_ind] + 1
-        array_pairs[1].append(block.find(wildcard[::-1], start_ind))
-        start_ind = array_pairs[1][array_ind] + 1
-        array_ind += 1
-    return array_pairs
-   
-
-
-# so, how do I wrie the unencrypted text back WITH the formatting? I think I need to
-# spell it out via text then put it back? idk
 def unlock_file(item, Fernet_object):
     array_prs = [[], []]
     submit = []
     results = []
     final_line = ''
-    with open(item,'r+b') as lock_file:
+    with open(item,'r+') as lock_file:
         enc_text = lock_file.readlines()
         print(len(enc_text))
         lock_file.seek(0)
         lock_file.truncate(0)
         for line in enc_text:
             if len(line) > 2:
-                final_line+=str(Fernet_object.decrypt(line))
+                raw_decr = Fernet_object.decrypt(ast.literal_eval(line))
+                final_line+=raw_decr.decode()
+                #final_line+=str(ast.literal_eval(Fernet_object.decrypt(line.encode())))
 
               
 
         lock_file.write(final_line)
-        #print(len(decrypt_text))
-        print(decrypt_text)
-        print(array_prs)
-        #lock_file.writelines(str(decrypt_text))
-       
+        
     return "Done - Decrypt"
        
    
